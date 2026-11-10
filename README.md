@@ -1,143 +1,123 @@
 # LAN Audio
 
-**Stream âm thanh Windows tới điện thoại qua mạng LAN.**
-
-[![Release](https://img.shields.io/github/v/release/BllakFoxV/lan-audio)](https://github.com/BllakFoxV/lan-audio/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4)](https://github.com/BllakFoxV/lan-audio/releases/latest)
-
-LAN Audio thu âm thanh đang phát trên PC bằng WASAPI loopback và truyền trực tiếp
-tới trình duyệt trên điện thoại. Không cần cài ứng dụng điện thoại, driver âm thanh
-ảo hay Python khi dùng bản portable.
+Nghe âm thanh từ máy tính Windows trên điện thoại qua mạng LAN.
+Ứng dụng lấy âm thanh từ thiết bị phát mặc định của Windows bằng WASAPI loopback
+và truyền đến trình duyệt trên điện thoại.
 
 ## Tải về
 
-| Gói | Nội dung |
+Tải bản [LAN Audio 0.1](https://github.com/BllakFoxV/lan-audio/releases/tag/v0.1):
+
+| File | Cách dùng |
 | --- | --- |
-| [LAN Audio 0.1 — EXE](https://github.com/BllakFoxV/lan-audio/releases/download/v0.1/LAN-Audio-v0.1-Windows-x64.exe) | Một file chạy độc lập, đã kèm Python, QR và ADB |
-| [LAN Audio 0.1 — ZIP](https://github.com/BllakFoxV/lan-audio/releases/download/v0.1/LAN-Audio-v0.1-Windows-x64.zip) | Giải nén rồi chạy `LAN Audio.exe` |
-| [SHA256SUMS.txt](https://github.com/BllakFoxV/lan-audio/releases/download/v0.1/SHA256SUMS.txt) | Mã kiểm tra tính toàn vẹn của EXE và ZIP |
+| [EXE](https://github.com/BllakFoxV/lan-audio/releases/download/v0.1/LAN-Audio-v0.1-Windows-x64.exe) | Tải về và mở trực tiếp |
+| [ZIP](https://github.com/BllakFoxV/lan-audio/releases/download/v0.1/LAN-Audio-v0.1-Windows-x64.zip) | Giải nén rồi mở `LAN Audio.exe` |
+| [SHA256SUMS.txt](https://github.com/BllakFoxV/lan-audio/releases/download/v0.1/SHA256SUMS.txt) | Mã SHA-256 để kiểm tra file EXE và ZIP |
 
-Yêu cầu: **Windows 10/11 64-bit**, thiết bị đầu ra âm thanh hoạt động và điện thoại
-có Chrome/Safari hỗ trợ Web Audio. PC và điện thoại cần truy cập được nhau trong LAN.
+Bản đóng gói đã kèm Python, thư viện tạo QR, chương trình thu âm và ADB.
 
-## Sử dụng
+## Yêu cầu
 
-1. Mở app — server tự khởi động, không có nút Bắt đầu/Dừng.
-2. Nếu Windows hỏi quyền mạng, cho phép LAN Audio trên mạng Private đang dùng.
-3. Quét QR bằng điện thoại, mở đường link rồi bấm **Bật nghe**.
-4. Phát nhạc hoặc video trên PC. Đóng cửa sổ app để tắt server và thu âm.
+- Máy tính chạy Windows 10/11 64-bit và có thiết bị phát âm thanh hoạt động.
+- Điện thoại dùng trình duyệt Chrome hoặc Safari phiên bản mới, hỗ trợ Web Audio.
+- Máy tính và điện thoại truy cập được nhau qua mạng LAN. Máy tính có thể dùng
+  dây mạng, điện thoại dùng Wi-Fi.
 
-PC có thể dùng Ethernet, điện thoại dùng Wi-Fi. Nếu PC có nhiều IP, chọn địa chỉ
-cùng mạng với điện thoại trong danh sách tự hiện dưới QR. **Sao chép link** cho phép
-mở client thủ công. Trên điện thoại có nút nghe/dừng và thanh âm lượng.
+## Cách dùng
 
-### Tự mở qua ADB
+1. Mở LAN Audio. Ứng dụng tự bắt đầu chia sẻ âm thanh.
+2. Cho phép truy cập mạng Private nếu Windows Firewall hỏi.
+3. Quét QR bằng điện thoại, mở link và bấm **Bật nghe**.
+4. Phát nhạc hoặc video trên máy tính để nghe trên điện thoại.
+5. Đóng cửa sổ LAN Audio khi muốn kết thúc chia sẻ.
 
-Nếu chưa có ai nghe và phát hiện thiết bị ADB đã cấp quyền (`device`), app mở link
-trên trình duyệt mặc định của thiết bị. App kiểm tra thiết bị mỗi 3 giây.
+Nếu máy tính có nhiều địa chỉ IP, chọn IP cùng mạng với điện thoại ở danh sách
+dưới QR. Có thể bấm **Sao chép link** để mở link thủ công.
+Trang nghe trên điện thoại có nút **Bật nghe / Dừng nghe** và thanh chỉnh âm lượng.
 
-- **Mỗi thiết bị chỉ được gọi mở link một lần trong suốt lần mở app.**
-- Không mở lặp khi chưa bấm nghe, đổi IP, rút/cắm lại thiết bị hoặc khi lệnh lỗi.
-- Đóng rồi mở lại app mới đặt lại giới hạn; thiết bị cắm vào sau cũng được phát hiện.
-- Bỏ qua thiết bị `offline` / `unauthorized`; không tự cấp quyền USB debugging.
+### Mở link bằng ADB
 
-Bản portable có sẵn ADB. Điện thoại vẫn cần truy cập được link LAN và bấm
-**Bật nghe** để đáp ứng quy tắc phát âm thanh của trình duyệt.
+Khi chưa có thiết bị nào đang nghe, ứng dụng có thể tự mở link trên thiết bị
+Android được ADB nhận diện ở trạng thái `device`. Thiết bị cần bật USB debugging
+và cấp quyền kết nối ADB cho máy tính.
 
-## Cách hoạt động
+Mỗi thiết bị được thử mở link một lần trong mỗi lần chạy ứng dụng, kể cả khi
+lệnh mở thất bại. Điện thoại vẫn cần truy cập được mạng LAN và bấm **Bật nghe**.
 
-```text
-Âm thanh Windows → WASAPI loopback → HTTP/PCM trong LAN → Web Audio trên điện thoại
-                                      ↑
-                              QR hoặc link qua ADB
-```
+## Lưu ý
 
-- Thu thiết bị phát mặc định của Windows; **không thu microphone**.
-- Truyền PCM float32; giữ sample rate của đầu ra, tối đa hai kênh.
-- 48 kHz stereo sử dụng khoảng 3.1 Mbps cho mỗi thiết bị nghe.
-- Buffer trình duyệt khoảng 120 ms; độ trễ thực tế phụ thuộc mạng và thiết bị.
-- Token được tạo mới mỗi lần chạy. Cookie phiên giữ kết nối sau khi quét QR.
-- Link thiếu/sai token vẫn mở trang hướng dẫn; luồng âm thanh yêu cầu token hợp lệ.
+- Link có token truy cập riêng cho mỗi lần chạy. Mở lại ứng dụng thì quét QR mới.
+- Kết nối dùng HTTP, không mã hóa. Chỉ dùng trong LAN tin cậy và giữ kín link/QR.
+- Giữ trang nghe mở. Trình duyệt có thể tạm dừng âm thanh khi khóa màn hình
+  hoặc chạy nền.
+- Khi đổi thiết bị phát âm thanh hoặc đổi mạng, mở lại ứng dụng và quét QR mới.
+- Âm thanh truyền ở dạng PCM float32, tối đa hai kênh. Với thiết bị nhiều kênh,
+  ứng dụng lấy hai kênh đầu.
+- Độ trễ phụ thuộc mạng và thiết bị. Nội dung được bảo vệ hoặc thiết bị phát
+  ở chế độ exclusive có thể không thu được.
 
-HTTP không mã hóa; dùng trong **LAN tin cậy**. Người có link/QR có thể nghe trong
-lần chạy đó. Không mở cổng trực tiếp ra Internet.
+## Xử lý lỗi thường gặp
 
-## Mã nguồn và build
+| Vấn đề | Cách kiểm tra |
+| --- | --- |
+| Điện thoại không mở được link | Kiểm tra mạng LAN, IP đã chọn và quyền Windows Firewall. Wi-Fi khách có thể chặn kết nối giữa các thiết bị. |
+| Link hết hạn | Quét lại QR đang hiển thị trên máy tính. |
+| Đã kết nối nhưng không có tiếng | Bấm **Bật nghe**, kiểm tra âm lượng trên điện thoại và thiết bị phát mặc định của Windows. |
+| Cổng đang được dùng | Đóng phiên LAN Audio cũ hoặc chạy từ dòng lệnh với `--port` khác. |
+| ADB không mở link | Kiểm tra thiết bị bằng `adb devices` và cấp quyền USB debugging. Mở lại ứng dụng để thử lại. |
 
-```text
-app/                 GUI, server, web player, WASAPI và thư viện QR offline
-build/               Script đóng gói, PyInstaller spec, phiên bản và release notes
-tests/               Kiểm thử giao thức, xác thực, vòng đời server và ADB
-.build/              Cache và binary thu âm đã biên dịch — không commit
-.build-venv/         Môi trường build riêng — không commit
-dist/                App portable, ZIP và checksum — không commit
-CHANGELOG.md         Lịch sử phát hành
-```
+Nhật ký của bản đóng gói nằm tại `%LOCALAPPDATA%\LAN Audio\app.log`.
 
-### Chạy từ mã nguồn
+## Chạy từ mã nguồn
 
-Cần Python có Tcl/Tk và .NET Framework C# compiler đi kèm Windows.
-Thư viện QR đã được đóng gói trong `app/vendor/`, không cần pip khi chạy nguồn.
+Cần Python 3 64-bit có Tcl/Tk và trình biên dịch C# của .NET Framework tại
+`%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe`.
+Thư viện QR đã có trong `app/vendor/`.
+
+Chạy các lệnh sau từ thư mục gốc của dự án:
 
 ```powershell
 python app/gui.py
-# Hoặc nhấp đúp start.cmd / LAN Audio.vbs
+```
 
-# Đổi cổng hoặc chỉ định adapter:
+Cũng có thể mở `start.cmd` hoặc `LAN Audio.vbs` khi Python đã có trong PATH.
+
+```powershell
+# Chọn cổng và địa chỉ mạng của máy tính
 python app/gui.py --port 8765 --bind 192.168.1.10
 
-# Chế độ dòng lệnh; Ctrl+C để thoát:
+# Chạy server trong terminal, nhấn Ctrl+C để dừng
 python app/server.py --port 8765
 ```
 
-Khi chạy từ nguồn, ADB là tùy chọn: đặt trong PATH, cạnh `app/gui.py`, hoặc trong
-`platform-tools` của `ANDROID_SDK_ROOT` / `ANDROID_HOME`.
+Để dùng ADB khi chạy từ nguồn, thêm ADB vào PATH, đặt cạnh `app/gui.py`, hoặc đặt
+trong thư mục `platform-tools` của `ANDROID_SDK_ROOT` / `ANDROID_HOME`.
 
-### Build portable
+## Build và kiểm thử
 
-Đã build và kiểm thử với Python 3.15 x64. Cần Android platform-tools để đóng gói ADB.
-Chạy từ thư mục gốc của repo:
+Để tạo bản đóng gói, chuẩn bị Android platform-tools có `adb.exe` và `NOTICE.txt`,
+rồi chạy:
 
 ```powershell
 ./build/build.ps1 -AdbDirectory C:/Soft/adb
 ```
 
-Script tạo môi trường riêng, cài dependency theo `build/requirements-build.txt`,
-chạy kiểm thử, biên dịch WASAPI helper và tạo EXE/ZIP/checksum trong `dist/`.
+Thay `C:/Soft/adb` bằng thư mục platform-tools trên máy.
+Script cài thư viện build trong `.build-venv/`, biên dịch phần thu âm, chạy kiểm thử
+và tạo EXE, ZIP, checksum trong `dist/`.
 
-### Kiểm thử
+Chạy riêng bộ kiểm thử:
 
 ```powershell
 python -m unittest discover -s tests -t . -q
 ```
 
-Bộ kiểm thử bao phủ xác thực QR/cookie, stream PCM, token mới khi khởi động lại,
-cổng bị chiếm, dọn tiến trình thu âm và giới hạn ADB một lần cho mỗi thiết bị.
+Mã ứng dụng nằm trong `app/`, cấu hình đóng gói trong `build/` và kiểm thử trong `tests/`.
 
-## Xử lý sự cố
+## Thư viện và công cụ sử dụng
 
-| Triệu chứng | Cách xử lý |
-| --- | --- |
-| Điện thoại không mở được link | Kiểm tra cùng LAN, IP đã chọn, quyền Firewall và Wi-Fi guest/client isolation |
-| Link hết hạn / yêu cầu ghép nối | Quét QR hiện tại; mỗi lần mở lại app sẽ có token mới |
-| Cổng đang dùng | Đóng app/server cũ hoặc chạy với `--port` khác |
-| Có kết nối nhưng không nghe | Bấm Bật nghe, kiểm tra âm lượng và thiết bị phát mặc định trên PC |
-| Đổi loa / tai nghe | Đóng rồi mở lại app, quét QR mới |
-| ADB không tự mở | Kiểm tra quyền USB debugging; giới hạn một lần được đặt lại khi mở lại app |
+- [python-qrcode](https://github.com/lincolnloop/python-qrcode) 8.2, giấy phép BSD-3-Clause.
+- Python và Tcl/Tk cho ứng dụng desktop.
+- Android platform-tools để mở link qua ADB.
 
-Nhật ký bản portable: `%LOCALAPPDATA%/LAN Audio/app.log`.
-
-## Giới hạn
-
-- Giữ trang web mở khi nghe; trình duyệt có thể dừng âm thanh khi khóa màn hình hoặc chạy nền.
-- Âm thanh được bảo vệ hoặc ứng dụng dùng thiết bị ở chế độ exclusive có thể không thu được.
-- Với đầu ra nhiều hơn hai kênh, chỉ truyền hai kênh đầu.
-- Không tự kết nối lại sau khi đổi thiết bị âm thanh hoặc đổi mạng; mở lại app để làm mới.
-
-## Thành phần bên thứ ba
-
-QR sử dụng [python-qrcode](https://github.com/lincolnloop/python-qrcode) 8.2 (BSD-3-Clause).
-Bản portable kèm Python, Tcl/Tk và Android platform-tools; các thông báo giấy phép
-được đóng gói trong thư mục `licenses/` bên trong app.
-
-Xem [CHANGELOG](CHANGELOG.md) và [các bản phát hành](https://github.com/BllakFoxV/lan-audio/releases).
+Xem lịch sử phát hành trong [CHANGELOG.md](CHANGELOG.md).
