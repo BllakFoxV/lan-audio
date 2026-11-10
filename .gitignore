@@ -1,0 +1,9 @@
+app/Loopback.exe
+__pycache__/
+.build-venv/
+.build/
+dist/
+*.log
+.env
+.env.*
+!.env.example
