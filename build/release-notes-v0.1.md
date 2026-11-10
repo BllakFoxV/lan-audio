@@ -1,28 +1,35 @@
 ## LAN Audio 0.1
 
-Bản public đầu tiên: truyền âm thanh PC Windows sang trình duyệt điện thoại trong LAN.
+Bản phát hành đầu tiên. Nghe âm thanh từ máy tính Windows trên trình duyệt
+điện thoại qua mạng LAN.
 
-### Điểm nổi bật
+### Tính năng
 
-- App portable Windows x64: không cần cài Python, driver âm thanh ảo hoặc ứng dụng điện thoại.
-- Mở app là server chạy; giao diện gọn với QR, trạng thái và sao chép link.
-- Thu âm WASAPI loopback và phát PCM qua Web Audio, có âm lượng và trạng thái kết nối.
-- QR offline có token, lưu cookie phiên; link cũ hiện hướng dẫn ghép nối thay vì lỗi 403 mặc định.
-- Có ADB đã cấp quyền thì tự mở link khi chưa có ai nghe. Mỗi thiết bị chỉ mở một lần trong suốt lần mở app.
-- Đã kèm Python, QR, phần thu âm và ADB; có log để chẩn đoán lỗi.
-- Tách mã nguồn / build / kiểm thử; 16 kiểm thử tự động đã qua.
+- Tự bắt đầu chia sẻ âm thanh khi mở ứng dụng.
+- Quét QR hoặc sao chép link để kết nối điện thoại.
+- Chọn IP khi máy tính có nhiều địa chỉ mạng.
+- Bật/dừng nghe, chỉnh âm lượng và xem trạng thái trên điện thoại.
+- Tự mở link trên thiết bị Android đã cấp quyền ADB khi chưa có ai nghe.
+  Mỗi thiết bị được thử mở một lần trong mỗi lần chạy ứng dụng.
 
 ### Tải và chạy
 
-Tải `LAN-Audio-v0.1-Windows-x64.exe` rồi mở, hoặc giải nén ZIP và chạy `LAN Audio.exe`.
-Cho phép truy cập mạng Private nếu Windows hỏi, quét QR và bấm **Bật nghe** trên điện thoại.
-Đóng app để tắt server. `SHA256SUMS.txt` chứa checksum của hai gói tải về.
+1. Tải `LAN-Audio-v0.1-Windows-x64.exe` và mở trực tiếp, hoặc giải nén file ZIP
+   rồi mở `LAN Audio.exe`.
+2. Cho phép truy cập mạng Private nếu Windows Firewall hỏi.
+3. Quét QR bằng điện thoại, mở link và bấm **Bật nghe**.
+4. Phát âm thanh trên máy tính. Đóng ứng dụng để kết thúc chia sẻ.
 
-### Yêu cầu và giới hạn
+Bản đóng gói đã kèm Python, thư viện tạo QR, chương trình thu âm và ADB.
+File `SHA256SUMS.txt` chứa mã SHA-256 của EXE và ZIP.
 
-Windows 10/11 64-bit, thiết bị đầu ra âm thanh hoạt động và điện thoại cùng LAN.
-Trình duyệt vẫn cần một lần bấm để phát âm thanh; không bảo đảm phát khi khóa màn hình.
-Đổi đầu ra âm thanh hoặc mạng cần mở lại app. HTTP dành cho LAN tin cậy.
+### Yêu cầu và lưu ý
 
-Xem [README](https://github.com/BllakFoxV/lan-audio#readme) và
-[CHANGELOG](https://github.com/BllakFoxV/lan-audio/blob/main/CHANGELOG.md).
+- Windows 10/11 64-bit, có thiết bị phát âm thanh hoạt động.
+- Điện thoại có Chrome hoặc Safari phiên bản mới và truy cập được máy tính qua LAN.
+- Dùng trong LAN tin cậy vì kết nối HTTP không mã hóa. Giữ kín link/QR.
+- Giữ trang nghe mở; trình duyệt có thể dừng âm thanh khi khóa màn hình hoặc chạy nền.
+- Khi đổi thiết bị phát âm thanh hoặc đổi mạng, mở lại ứng dụng và quét QR mới.
+
+Xem hướng dẫn trong [README](https://github.com/BllakFoxV/lan-audio#readme)
+và [lịch sử phát hành](https://github.com/BllakFoxV/lan-audio/blob/main/CHANGELOG.md).
