@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>LAN Audio</title>
+<style>
+  :root{color-scheme:dark;font-family:system-ui,sans-serif;background:#101822;color:#f1f6fc}
+  body{max-width:320px;margin:10vh auto;padding:24px}h1{font-size:24px;margin:0 0 24px}
+  p{color:#aebed0;line-height:1.6}button{border:0;border-radius:14px;padding:18px 22px;font:700 18px system-ui;cursor:pointer;background:#7fe4c3;color:#0c2920;width:100%}
+  button:disabled{opacity:.5}label{display:block;margin:26px 0 10px}input{width:100%;accent-color:#7fe4c3}#status{min-height:50px;font-size:14px}
+  .card{padding:0}small{color:#aebed0;line-height:1.6}
+</style>
+<div class="card">
+  <h1>LAN Audio</h1>
+  <button id="play" disabled>Bật nghe</button>
+  <label for="volume">Âm lượng <span id="level">80%</span></label>
+  <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8">
+  <p id="status" role="status" aria-live="polite">Đang kết nối…</p>
+</div>
+<script>
+const button=document.querySelector('#play'), status=document.querySelector('#status');
+const volume=document.querySelector('#volume'), level=document.querySelector('#level');
+const token=new URLSearchParams(location.search).get('token')||'';
+const endpoint=path=>path+(token?'?token='+encodeURIComponent(token):'');
+const pairingMessage=token?'Link đã hết hạn. Quét lại QR đang hiện trên PC.':'Quét mã QR trong app LAN Audio trên PC để kết nối.';
+let current=null;
+volume.oninput=()=>{level.textContent=Math.round(volume.value*100)+'%';if(current?.gain)current.gain.gain.value=+volume.value;};
+
+function stop(session){
+  if(!session)return;
+  session.abort.abort();
+  for(const source of session.sources){try{source.stop();}catch{}}
+  session.sources.clear();
+  if(session.context)session.context.close().catch(()=>{});
+  if(current===session){current=null;button.textContent='Bật nghe';}
+}
+
+async function start(){
+  const session={abort:new AbortController(),context:null,gain:null,sources:new Set()};
+  current=session;button.textContent='Dừng nghe';status.textContent='Đang kết nối…';
+  try{
+    // Create/resume synchronously in the tap handler for mobile autoplay rules.
+    const Audio=window.AudioContext||window.webkitAudioContext;
+    if(!Audio)throw Error('Trình duyệt chưa hỗ trợ Web Audio.');
+    const context=session.context=new Audio({latencyHint:'interactive'});
+    const resumed=context.resume();
+    const gain=session.gain=context.createGain();gain.gain.value=+volume.value;gain.connect(context.destination);
+    await resumed;
+    const response=await fetch(endpoint('/stream'),{signal:session.abort.signal,cache:'no-store',credentials:'same-origin'});
+    if(!response.ok){if(response.status===403)button.disabled=true;throw Error(response.status===403?pairingMessage:'PC chưa sẵn sàng. Bắt đầu chia sẻ lại trên PC.');}
+    if(!response.body?.getReader)throw Error('Hãy dùng Safari hoặc Chrome phiên bản mới.');
+    const reader=response.body.getReader();
+    let pending=new Uint8Array(0),rate=0,channels=0,next=0,announced=false;
+    while(current===session){
+      const {value,done}=await reader.read();
+      if(done)throw Error('Server đã dừng hoặc thiết bị âm thanh đã thay đổi.');
+      const joined=new Uint8Array(pending.length+value.length);joined.set(pending);joined.set(value,pending.length);pending=joined;
+      let offset=0;
+      if(!rate){
+        if(pending.length<12)continue;
+        const header=new DataView(pending.buffer,pending.byteOffset,12);
+        if(header.getUint32(0,true)!==0x314e414c)throw Error('Dữ liệu âm thanh không hợp lệ.');
+        rate=header.getUint32(4,true);channels=header.getUint32(8,true);offset=12;
+        if(rate<8000||rate>384000||![1,2].includes(channels))throw Error('Định dạng âm thanh không hợp lệ.');
+      }
+      while(pending.length-offset>=4){
+        const length=new DataView(pending.buffer,pending.byteOffset+offset,4).getUint32(0,true);
+        if(length>rate*channels*4||length%(channels*4))throw Error('Gói âm thanh không hợp lệ.');
+        if(pending.length-offset<length+4)break;
+        offset+=4;if(!length)continue;
+        const pcm=new DataView(pending.buffer,pending.byteOffset+offset,length);offset+=length;
+        // Do not accumulate delayed audio while the browser is in the background.
+        if(context.state!=='running'){next=0;status.textContent='Âm thanh đang tạm dừng. Bấm Dừng nghe rồi Bật nghe để tiếp tục.';continue;}
+        if(next<context.currentTime||next>context.currentTime+0.4){
+          for(const source of session.sources){try{source.stop();}catch{}}
+          session.sources.clear();next=context.currentTime+0.12;
+        }
+        const frames=length/(4*channels),buffer=context.createBuffer(channels,frames,rate);
+        for(let c=0;c<channels;c++){
+          const target=buffer.getChannelData(c);
+          for(let i=0;i<frames;i++)target[i]=pcm.getFloat32((i*channels+c)*4,true);
+        }
+        const source=context.createBufferSource();source.buffer=buffer;source.connect(gain);
+        session.sources.add(source);source.onended=()=>{session.sources.delete(source);source.disconnect();};
+        source.start(next);next+=buffer.duration;
+        status.textContent='Đang nghe · '+(rate/1000)+' kHz · '+(channels===2?'Stereo':'Mono');announced=true;
+      }
+      pending=pending.slice(offset);
+      if(!announced)status.textContent='Đã kết nối. Đang chờ âm thanh từ PC…';
+    }
+  }catch(error){
+    if(current===session){
+      stop(session);
+      status.textContent=error.name==='AbortError'?'Đã dừng.':error.message;
+    }
+  }
+}
+button.onclick=()=>{if(current){stop(current);status.textContent='Đã dừng.';}else{start();}};
+window.addEventListener('pagehide',()=>stop(current));
+// Scanning connects to the server; playback still needs a tap on mobile.
+fetch(endpoint('/status'),{cache:'no-store',credentials:'same-origin'})
+  .then(async response=>{
+    if(!response.ok)throw Error(response.status===403?pairingMessage:'Không kết nối được với PC.');
+    const info=await response.json();
+    if(info.error)throw Error('PC đã dừng thu âm. Hãy khởi động lại chia sẻ trên PC.');
+    button.disabled=false;
+    if(!current)status.textContent='Đã kết nối · Bấm Bật nghe';
+  })
+  .catch(error=>{if(!current)status.textContent=error.message||'Không kết nối được với PC.';});
+</script>
+</html>
